@@ -2,22 +2,26 @@ Program = _{ SOI ~ Expr ~ EOF }
 
 Expr = { UnaryExpr | BinaryExpr | Term }
 
-Term = _{ Float | Int | "(" ~ Expr ~ ")" }
+Term = _{ Number | "(" ~ Expr ~ ")" }
 
 UnaryExpr = { Sign ~ Term }
 
 BinaryExpr = { Term ~ (Operator ~ Term)+ }
 
-Operator = { "+" | "-" | "*" | "/" }
+Operator = _{ plus | minus | mul | div }
+    plus = { "+" }
+    minus = { "-" }
+    mul = { "*" }
+    div = { "/" }
 
-Sign = { "+" | "-" }
+Sign = _{ positive | negative }
+    positive = { "+" }
+    negative = { "-" }
 
-Int = @{ Sign? ~ ASCII_DIGIT+ }
-
-Float = @{
+Number = @{
     Sign? 
     ~ ASCII_DIGIT+
-    ~ ("." ~ ASCII_DIGIT+)
+    ~ ("." ~ ASCII_DIGIT+)?
 }
 
 WHITESPACE = _{ " " | "\t" }

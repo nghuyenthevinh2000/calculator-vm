@@ -11,8 +11,8 @@ pub enum Operator {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Sign {
-    Plus,
-    Minus,
+    Positive,
+    Negative,
 }
 
 impl fmt::Display for Operator {
@@ -29,8 +29,8 @@ impl fmt::Display for Operator {
 impl fmt::Display for Sign {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match &self {
-            Sign::Plus => write!(f, "+"),
-            Sign::Minus => write!(f, "-"),
+            Sign::Positive => write!(f, "+"),
+            Sign::Negative => write!(f, "-"),
         }
     }
 }
@@ -39,8 +39,7 @@ impl fmt::Display for Sign {
 // ANCHOR: node
 // node to construct AST tree
 pub enum Node {
-    Int(i32),
-    Float(Decimal),
+    Number(Decimal),
     UnaryExpr {
         op: Sign,
         child: Box<Node>,
@@ -56,8 +55,7 @@ pub enum Node {
 impl fmt::Display for Node {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match &self {
-            Node::Int(n) => write!(f, "{}", n),
-            Node::Float(n) => write!(f, "{}", n),
+            Node::Number(n) => write!(f, "{}", n),
             Node::UnaryExpr { op, child } => write!(f, "{}{}", op, child),
             Node::BinaryExpr { op, lhs, rhs } => write!(f, "{} {} {}", lhs, op, rhs),
         }
