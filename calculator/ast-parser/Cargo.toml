@@ -1,0 +1,15 @@
+[package]
+name = "calculator-ast-parser"
+version = "0.0.0"
+authors = ["Vinh Nguyen <nghuyenthevinh@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+pest = "2.1"
+pest_derive = "2.1"
+anyhow = "1.0"
+ordered-float = { version = "4.1.0", default-features = false }
+rust_decimal = "1.32.0"
+
+[lib]
+path = "src/lib.rs"
