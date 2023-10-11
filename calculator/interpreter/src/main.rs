@@ -2,16 +2,22 @@ mod interpreter;
 use calculator_ast_parser::Compile;
 use interpreter::Interpreter;
 
-pub fn main() {
-    // rework main to expose cli interactions
+use clap::{Arg, Parser};
 
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 2 {
-        eprintln!("No input file was provided");
-        std::process::exit(-1);
-    }
-    println!(
-        "{:?}",
-        Interpreter::from_source(&std::fs::read_to_string(&args[1]).unwrap()).unwrap()
+#[derive(Debug, Parser)]
+#[command(author, version)]
+#[command(about = "calculator - a simple CLI to calculate")]
+struct Cli {
+    operation: String
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    let out = Interpreter::from_source(&cli.operation).unwrap_or_else(
+        |e| {
+            panic!("parse error: {}", e)
+        }
     );
+    println!("result is {}", out)
 }
