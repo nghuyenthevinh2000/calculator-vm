@@ -17,4 +17,4 @@ The size of our OpCode will be 8 bit. Therefore, data will be converted into arr
 * OpMinus
 
 3. Virtual machine
-A virtual machine is created to handle bytecode by iteratively going through each bytes and then processing them
+A virtual machine is created to handle bytecode by iteratively going through each bytes and then processing them. Temporary result is stored in a stack for further processing.
