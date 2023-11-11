@@ -1,5 +1,4 @@
 #![allow(clippy::only_used_in_recursion)]
-use rust_decimal::{Decimal, prelude::{FromPrimitive, Zero}};
 
 use calculator_ast_parser::{Compile, Node, Operator, Result, Sign};
 
@@ -7,11 +6,11 @@ use calculator_ast_parser::{Compile, Node, Operator, Result, Sign};
 pub struct Interpreter;
 
 impl Compile for Interpreter {
-    type Output = Result<Decimal>;
+    type Output = Result<f64>;
 
     // f64 computation
     fn from_ast(ast: Vec<Node>) -> Self::Output {
-        let mut ret = Decimal::zero();
+        let mut ret = 0 as f64;
         let evaluator = Eval::new();
         for node in ast {
             ret += evaluator.eval(&node);
@@ -29,7 +28,7 @@ impl Eval {
         Self
     }
     // ANCHOR: interpreter_eval
-    pub fn eval(&self, node: &Node) -> Decimal {
+    pub fn eval(&self, node: &Node) -> f64 {
         match node {
             Node::Number(n) => *n,
             Node::UnaryExpr { op, child } => {
@@ -44,8 +43,8 @@ impl Eval {
                 let rhs_ret = self.eval(rhs);
 
                 match op {
-                    Operator::Plus => lhs_ret + rhs_ret,
-                    Operator::Minus => lhs_ret - rhs_ret,
+                    Operator::Add => lhs_ret + rhs_ret,
+                    Operator::Sub => lhs_ret - rhs_ret,
                     Operator::Mul => lhs_ret * rhs_ret,
                     Operator::Div => lhs_ret / rhs_ret,
                 }

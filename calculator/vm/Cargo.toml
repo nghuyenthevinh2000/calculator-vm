@@ -1,5 +1,5 @@
 [package]
-name = "calculator-compiler"
+name = "calculator-vm"
 description = "calculator compiler based on llvm"
 version = "0.0.0"
 authors = ["Vinh Nguyen <nghuyenthevinh@gmail.com>"]
@@ -8,9 +8,6 @@ edition = "2018"
 [dependencies]
 calculator-ast-parser = { path="../ast-parser" }
 clap = { version = "4.4.6", features = ["derive"] }
-inkwell = { version = "0.2.0", features = [
-    "llvm14-0",
-]}
 
 [[bin]]
 name = "main"

@@ -1,5 +1,5 @@
 use calculator_ast_parser::{Result, Compile, Node, Operator, Sign};
-use inkwell::{context::Context, types::FloatType, builder::Builder, values::{FloatValue, AnyValue}, execution_engine::JitFunction};
+use inkwell::{context::Context, types::FloatType, values::{FloatValue, AnyValue}, execution_engine::JitFunction};
 
 pub struct Compiler;
 
@@ -96,15 +96,15 @@ impl <'a> RecursiveBuilder<'a> {
 
     fn build(&self, ast: &Node) -> FloatValue {
         match ast {
-            Node::Number(dec) => self.f64_type.const_float_from_string(&dec.to_string()),
+            Node::Number(dec) => self.f64_type.const_float(*dec),
             Node::BinaryExpr { op, lhs, rhs } => {
                 let lhs_num = self.build(lhs);
                 let rhs_num = self.build(rhs);
 
                 // perform computation
                 match op {
-                    Operator::Minus => lhs_num.const_sub(rhs_num),
-                    Operator::Plus => lhs_num.const_add(rhs_num),
+                    Operator::Sub => lhs_num.const_sub(rhs_num),
+                    Operator::Add => lhs_num.const_add(rhs_num),
                     Operator::Mul => lhs_num.const_mul(rhs_num),
                     Operator::Div => lhs_num.const_div(rhs_num)
                 }

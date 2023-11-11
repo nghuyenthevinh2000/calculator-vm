@@ -1,7 +1,6 @@
 #![allow(clippy::upper_case_acronyms, clippy::result_large_err)]
 
 use pest::{self, Parser, pratt_parser::PrattParser, iterators::Pairs};
-use rust_decimal::Decimal;
 
 use crate::{ast::{Node, Operator}, Sign};
 
@@ -50,13 +49,13 @@ pub fn parse_binary_expr(pairs: Pairs<Rule>) -> Node {
                 Rule::Expr => parse_binary_expr(primary.into_inner()),
                 Rule::UnaryExpr => parse_binary_expr(primary.into_inner()),
                 Rule::BinaryExpr => parse_binary_expr(primary.into_inner()),
-                Rule::Number => Node::Number(primary.as_str().parse::<Decimal>().unwrap()),
+                Rule::Number => Node::Number(primary.as_str().parse::<f64>().unwrap()),
                 rule => unreachable!("Expr::parse expected atom, found {:?}", rule)
 }})
         .map_infix(|lhs, op, rhs| {
             let op = match op.as_rule() {
-                Rule::plus => Operator::Plus,
-                Rule::minus => Operator::Minus,
+                Rule::plus => Operator::Add,
+                Rule::minus => Operator::Sub,
                 Rule::mul => Operator::Mul,
                 Rule::div => Operator::Div,
                 rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
@@ -84,8 +83,6 @@ pub fn parse_binary_expr(pairs: Pairs<Rule>) -> Node {
 
 #[cfg(test)]
 mod tests {
-    use rust_decimal::prelude::FromPrimitive;
-
     use super::*;
     #[test]
     #[should_panic]
@@ -101,7 +98,7 @@ mod tests {
             plus_one.clone().unwrap(),
             vec![Node::UnaryExpr {
                 op: Sign::Positive,
-                child: Box::new(Node::Number(Decimal::from_i32(1).unwrap()))
+                child: Box::new(Node::Number(1.0))
             }]
         );
         assert_eq!(format!("{}", plus_one.unwrap()[0]), "+1");
@@ -112,7 +109,7 @@ mod tests {
             neg_two.clone().unwrap(),
             vec![Node::UnaryExpr {
                 op: Sign::Negative,
-                child: Box::new(Node::Number(Decimal::from_i32(2).unwrap()))
+                child: Box::new(Node::Number(2.0))
             }]
         );
         assert_eq!(format!("{}", neg_two.unwrap()[0]), "-2");
@@ -125,7 +122,7 @@ mod tests {
             positive.clone().unwrap(),
             vec![Node::UnaryExpr {
                 op: Sign::Positive,
-                child: Box::new(Node::Number(Decimal::from_f64(1.235).unwrap()))
+                child: Box::new(Node::Number(1.235))
             }]
         );
         assert_eq!(format!("{}", positive.unwrap()[0]), "+1.235");
@@ -136,7 +133,7 @@ mod tests {
             negative.clone().unwrap(),
             vec![Node::UnaryExpr { 
                 op: Sign::Negative, 
-                child: Box::new(Node::Number(Decimal::from_f64(0.78).unwrap()))
+                child: Box::new(Node::Number(0.78))
             }]
         );
         assert_eq!(format!("{}", negative.unwrap()[0]), "-0.78");
@@ -148,9 +145,9 @@ mod tests {
         assert_eq!(
             sum.clone().unwrap(),
             vec![Node::BinaryExpr {
-                op: Operator::Plus,
-                lhs: Box::new(Node::Number(Decimal::from_f64(1.7).unwrap())),
-                rhs: Box::new(Node::Number(Decimal::from_i32(2).unwrap()))
+                op: Operator::Add,
+                lhs: Box::new(Node::Number(1.7)),
+                rhs: Box::new(Node::Number(2.0))
             }]
         );
         assert_eq!(format!("{}", sum.unwrap()[0]), "1.7 + 2");
@@ -160,9 +157,9 @@ mod tests {
         assert_eq!(
             minus.clone().unwrap(),
             vec![Node::BinaryExpr {
-                op: Operator::Minus,
-                lhs: Box::new(Node::Number(Decimal::from_f64(1.7).unwrap())),
-                rhs: Box::new(Node::Number(Decimal::from_i32(2).unwrap()))
+                op: Operator::Sub,
+                lhs: Box::new(Node::Number(1.7)),
+                rhs: Box::new(Node::Number(2.0))
             }]
         );
         assert_eq!(format!("{}", minus.unwrap()[0]), "1.7 - 2");
@@ -176,8 +173,8 @@ mod tests {
             mul.clone().unwrap(),
             vec![Node::BinaryExpr { 
                 op: Operator::Mul, 
-                lhs: Box::new(Node::Number(Decimal::from_f64(3.56).unwrap())), 
-                rhs: Box::new(Node::Number(Decimal::from_i32(4).unwrap())) 
+                lhs: Box::new(Node::Number(3.56)), 
+                rhs: Box::new(Node::Number(4.0)) 
             }]
         );
         assert_eq!(format!("{}", mul.unwrap()[0]), "3.56 * 4");
@@ -188,8 +185,8 @@ mod tests {
             div.clone().unwrap(),
             vec![Node::BinaryExpr { 
                 op: Operator::Div, 
-                lhs: Box::new(Node::Number(Decimal::from_i32(3).unwrap())), 
-                rhs: Box::new(Node::Number(Decimal::from_i32(4).unwrap())) 
+                lhs: Box::new(Node::Number(3.0)), 
+                rhs: Box::new(Node::Number(4.0)) 
             }]
         );
         assert_eq!(format!("{}", div.unwrap()[0]), "3 / 4");
@@ -219,12 +216,12 @@ mod tests {
         assert_eq!(
             parse("1 + 0.5 * 0.3").unwrap(),
             vec![Node::BinaryExpr { 
-                op: Operator::Plus, 
-                lhs: Box::new(Node::Number(Decimal::from_i32(1).unwrap())), 
+                op: Operator::Add, 
+                lhs: Box::new(Node::Number(1.0)), 
                 rhs: Box::new(Node::BinaryExpr {
                     op: Operator::Mul,
-                    lhs: Box::new(Node::Number(Decimal::from_f32(0.5).unwrap())),
-                    rhs: Box::new(Node::Number(Decimal::from_f32(0.3).unwrap()))
+                    lhs: Box::new(Node::Number(0.5)),
+                    rhs: Box::new(Node::Number(0.3))
                 }),
             }]
         )
@@ -235,13 +232,13 @@ mod tests {
         assert_eq!(
             parse("1+2+3").unwrap(),
             vec![Node::BinaryExpr {
-                op: Operator::Plus,
+                op: Operator::Add,
                 lhs: Box::new(Node::BinaryExpr {
-                    op: Operator::Plus,
-                    lhs: Box::new(Node::Number(Decimal::from_i32(1).unwrap())),
-                    rhs: Box::new(Node::Number(Decimal::from_i32(2).unwrap())),
+                    op: Operator::Add,
+                    lhs: Box::new(Node::Number(1.0)),
+                    rhs: Box::new(Node::Number(2.0)),
                 }),
-                rhs: Box::new(Node::Number(Decimal::from_i32(3).unwrap())),
+                rhs: Box::new(Node::Number(3.0)),
             }]
         )
     }

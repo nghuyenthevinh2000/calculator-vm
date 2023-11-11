@@ -2,5 +2,6 @@
 members = [
     "calculator/ast-parser",
     "calculator/interpreter",
-    "calculator/compiler"
+    "calculator/compiler",
+    "calculator/vm"
 ]

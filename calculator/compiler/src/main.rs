@@ -2,7 +2,7 @@ mod compiler;
 use calculator_ast_parser::Compile;
 use compiler::Compiler;
 
-use clap::{Arg, Parser};
+use clap::Parser;
 
 #[derive(Debug, Parser)]
 #[command(author, version)]

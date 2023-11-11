@@ -1,10 +1,9 @@
 use std::fmt::{self};
-use rust_decimal::Decimal;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Operator {
-    Plus,
-    Minus,
+    Add,
+    Sub,
     Mul,
     Div
 }
@@ -18,8 +17,8 @@ pub enum Sign {
 impl fmt::Display for Operator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match &self {
-            Operator::Plus => write!(f, "+"),
-            Operator::Minus => write!(f, "-"),
+            Operator::Add => write!(f, "+"),
+            Operator::Sub => write!(f, "-"),
             Operator::Mul => write!(f, "*"),
             Operator::Div => write!(f, "/")
         }
@@ -35,11 +34,11 @@ impl fmt::Display for Sign {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 // ANCHOR: node
 // node to construct AST tree
 pub enum Node {
-    Number(Decimal),
+    Number(f64),
     UnaryExpr {
         op: Sign,
         child: Box<Node>,
